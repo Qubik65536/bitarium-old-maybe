@@ -1,0 +1,40 @@
+# Adapted from github/gitignore: Rust, OCaml, C, and Global/macOS.
+# https://github.com/github/gitignore
+
+# Rust build output; keep the application Cargo.lock.
+target/
+**/*.rs.bk
+rustc-ice-*.txt
+
+# OCaml / Dune and local opam switches.
+_build/
+_opam/
+*.annot
+*.cmo
+*.cma
+*.cmi
+*.cmx
+*.cmxs
+*.cmxa
+*.cmt
+*.cmti
+*.install
+
+# C3 output directories configured by the scaffold.
+/memory/build/
+/memory/out/
+
+# Host object/library/debug artifacts. Keep guest .bin/.elf/.hex files visible.
+*.o
+*.a
+*.dylib
+*.so
+*.so.*
+*.dSYM/
+
+# macOS metadata.
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+__MACOSX/
