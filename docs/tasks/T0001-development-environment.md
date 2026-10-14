@@ -4,13 +4,13 @@
 
 [Task guides](README.md) · [Progress](../progress.md) · [Setup commands](../development-environment.md)
 
-Status: Ready
+Status: Done
 
 Milestone: [M00](../progress.md)
 
 Dependencies: choose the current host's setup path; no implementation prerequisites
 
-Guide readiness: ready; actual execution not reported
+Guide readiness: ready; acceptance checks verified on macOS ARM64
 
 ## Objective and completion criterion
 
@@ -42,12 +42,12 @@ The installation and command details have one canonical home in the setup guide.
 
 ## Acceptance checks
 
-- [ ] Current host OS/version and architecture recorded.
-- [ ] Rust scaffold executable builds and runs.
-- [ ] C3 static-library scaffold builds.
-- [ ] OCaml scaffold executable builds and runs.
-- [ ] Actual compiler/build-tool versions and results recorded in a linked experiment note.
-- [ ] Generated build/local-switch directories excluded from version control; intended source and application lockfile retained.
+- [X] Current host OS/version and architecture recorded.
+- [X] Rust scaffold executable builds and runs.
+- [X] C3 static-library scaffold builds.
+- [X] OCaml scaffold executable builds and runs.
+- [X] Actual compiler/build-tool versions and results recorded in a linked experiment note.
+- [X] Generated build/local-switch directories excluded from version control; intended source and application lockfile retained.
 
 Editor integration can be configured during setup, but it does not replace compiler/build checks. Completion on one host does not mark all four full-MVP host targets complete.
 
@@ -61,14 +61,14 @@ Editor integration can be configured during setup, but it does not replace compi
 
 ## Actual results and evidence
 
-No build/run result reported or verified yet. The guide's commands and expected results are instructions, not execution evidence.
+Owner reported completion and tool versions. Review observed successful Rust build/run, C3 static-library build, and OCaml build/run on macOS 26.6.2 ARM64. Ignore checks exclude generated directories and retain sources and `runner/Cargo.lock`; see the linked experiment for commands and results.
 
-Experiment record: none yet.
+Experiment record: in [experiments/20261014.md](../experiments/20261014.md).
 
 ## Blockers and remaining work
 
-No blocker reported. All acceptance checks remain pending.
+No remaining T0001 acceptance check. Other host targets, native integration, substantive emulator implementation, and proofs remain unverified.
 
 ## Handoff
 
-Next action: select the current host setup path and follow the setup guide. After completion, prepare a task guide for checked C3 byte reads/writes under M01, including ownership, bounds, invalid-access behavior, and experiment-specific initial byte contents.
+Next action: prepare a task guide for checked C3 byte reads/writes under M01, including ownership, bounds, invalid-access behavior, and experiment-specific initial byte contents.

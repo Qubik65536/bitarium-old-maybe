@@ -1,6 +1,6 @@
 # Progress tracker
 
-![Stage: Planning](assets/badges/planning.svg) ![Builds / proofs: No evidence](assets/badges/unverified.svg)
+![Stage: Planning](assets/badges/planning.svg)
 
 [Documentation](README.md) · [Task guides](tasks/README.md) · [Session handoff](#session-handoff)
 
@@ -8,11 +8,11 @@ This file is the source of truth for milestone and task progress. [Status](statu
 
 ## Current position
 
-- Phase: environment preparation; no build, implementation, or proof completion has been reported or verified.
-- Current milestone: M00, local development environment.
-- Next ready task: [T0001, prepare the local development environment](tasks/T0001-development-environment.md).
+- Phase: local environment verified on macOS ARM64; emulator implementation and proofs remain unverified.
+- Current milestone: M01, checked C3 memory; M00 complete on the current host.
+- Next task guide to prepare: checked C3 byte reads/writes under M01.
 - Latest completed implementation task: none recorded.
-- Blockers for T0001: none recorded; choose the current host's setup path at the start of the task.
+- Blockers for T0001: none; acceptance checks passed.
 - Decisions needed before the first integrated guest program: RAM base, load address, entry PC, RAM initialization, fault state updates, and stopping conventions.
 
 ## State conventions
@@ -34,7 +34,7 @@ This is an initial working sequence. The product requirements are accepted; task
 
 | ID | Milestone | State | Prerequisites |
 | --- | --- | --- | --- |
-| M00 | Local environment | Not started | Current host identified |
+| M00 | Local environment | Done | Current host identified |
 | M01 | Checked C3 memory | Not started | M00; explicit access contract |
 | M02 | One Rust CPU step and native integration | Not started | M01; native interface specified |
 | M03 | First small guest program | Not started | M02; concrete platform/fault/stopping rules accepted |
@@ -51,7 +51,7 @@ This is an initial working sequence. The product requirements are accepted; task
 
 Rust and OCaml scaffold executables run; C3 static library builds; actual versions and host recorded.
 
-**Evidence:** None reported.
+**Evidence:** [Experiment note](experiments/20261014.md) records owner-reported versions and review-observed host/version, build/run, and ignore checks.
 
 ### M01 · Checked C3 memory
 
@@ -111,7 +111,7 @@ Add small tasks as the next milestone is researched. Avoid creating a detailed b
 
 | Task | Milestone | State | Guide | Evidence |
 | --- | --- | --- | --- | --- |
-| **T0001 · Prepare local environment** | M00 | Ready | [Open guide](tasks/T0001-development-environment.md) | Builds not reported |
+| **T0001 · Prepare local environment** | M00 | Done | [Open guide](tasks/T0001-development-environment.md) | [Observed checks on macOS ARM64](experiments/20261014.md) |
 
 Each task's record and tutorial live together in `tasks/`. Create the next task with [the task template](tasks/TEMPLATE.md). Research notes belong in `research/`; experiment and proof results belong in `experiments/` or the relevant verification record.
 
@@ -128,11 +128,11 @@ These rows track full-MVP acceptance per host. A T0001 scaffold build is setup e
 
 ## Session handoff
 
-- Last confirmed result: foundational machine choices accepted in ADR 0001-0010; no implementation/build result recorded.
-- Prepared material: [environment setup](development-environment.md) and T0001.
-- Work remaining in the current task: follow the selected host setup, create scaffolds locally, run independent builds, and record observed results.
-- Next action: begin T0001; if setup fails, record the failing command/output and the smallest recovery step.
-- Pending verification: all task acceptance checks, P01, and all four host targets.
+- Last confirmed result: T0001 acceptance checks passed on macOS 26.6.2 ARM64; Rust and OCaml scaffolds run and the C3 static library builds.
+- Prepared material: [environment setup](development-environment.md) and completed T0001.
+- Work remaining in the current task: none.
+- Next action: prepare the M01 guide for checked C3 byte reads/writes, including ownership, bounds, invalid-access behavior, and experiment-specific initial byte contents.
+- Pending verification: native integration, emulator behavior, P01, and all four full-MVP host targets.
 
 ## Updating progress
 
