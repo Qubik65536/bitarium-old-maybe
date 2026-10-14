@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="261" height="26" viewBox="0 0 261 26" role="img" aria-label="Specification: Accepted + proposed">
+  <title>Specification: Accepted + proposed</title>
+  <defs><clipPath id="badge-mixed"><rect width="261" height="26" rx="5"/></clipPath></defs>
+  <g clip-path="url(#badge-mixed)">
+    <rect width="107" height="26" fill="#233044"/>
+    <rect x="107" width="154" height="26" fill="#a46b13"/>
+  </g>
+  <g fill="#fff" font-family="DejaVu Sans, sans-serif" font-size="11">
+    <text x="53.5" y="17" text-anchor="middle">Specification</text>
+    <text x="184" y="17" text-anchor="middle">Accepted + proposed</text>
+  </g>
+</svg>
