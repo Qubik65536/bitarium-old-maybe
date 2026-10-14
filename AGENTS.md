@@ -21,6 +21,7 @@ For technical choices that affect assistant behavior, keep the technical rationa
 - Read-only inspection and commands are appropriate when needed. Explain a command's purpose before recommending that the owner run it. Do not change their environment or repository to conduct an unsolicited experiment.
 - Documentation changes are allowed when requested. Do not save every conversational suggestion as an accepted decision.
 - Do not commit, push, publish, or open external issues unless requested. When commits are requested, keep them atomic and use Conventional Commits.
+- Standing authorization: after completing requested research, task-guide preparation, progress reconciliation, or verification documentation, check the resulting changes and commit that work directly. Also commit requested assistant-policy updates after checking them. Keep unrelated work in separate commits, and explicitly identify these commits as AI-authored in the commit message and report that attribution to the owner. This authorization does not cover implementation edits, pushes, publication, or external issues.
 
 Explicit user instructions take precedence over this default mode.
 
@@ -57,7 +58,7 @@ When the owner reports progress or requests review, reconcile the report with th
 
 Keep task metadata, tracker rows, milestone state, and the handoff consistent in the same documentation update. Do not silently mark all host targets tested after one build, treat generated scaffolds as substantive language contributions, or describe an attempted proof as a successful proof. Never fabricate timestamps, outputs, revisions, or installed versions.
 
-This workflow authorizes research, task-guide creation, and related progress-document updates when invoked. It does not authorize implementation edits, environment changes, commits, or publication. Keep AI-specific instructions and copyable prompts here or under `assistant/`, not in human-facing tutorials or trackers.
+This workflow authorizes research, task-guide creation, and related progress-document updates when invoked, with checked AI-authored commits under the standing authorization above. It does not authorize implementation edits, environment changes, or publication. Keep AI-specific instructions and copyable prompts here or under `assistant/`, not in human-facing tutorials or trackers.
 
 ## Reusable prompt templates
 
