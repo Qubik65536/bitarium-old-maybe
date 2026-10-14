@@ -10,9 +10,9 @@ This file is the source of truth for milestone and task progress. [Status](statu
 
 - Phase: local environment verified on macOS ARM64; emulator implementation and proofs remain unverified.
 - Current milestone: M01, checked C3 memory; M00 complete on the current host.
-- Next task guide to prepare: checked C3 byte reads/writes under M01.
+- Next ready task: [T0002, checked C3 byte access](tasks/T0002-checked-byte-access.md).
 - Latest completed implementation task: none recorded.
-- Blockers for T0001: none; acceptance checks passed.
+- Blockers for T0002: none; its borrowed-storage exercise avoids unresolved machine and FFI decisions.
 - Decisions needed before the first integrated guest program: RAM base, load address, entry PC, RAM initialization, fault state updates, and stopping conventions.
 
 ## State conventions
@@ -35,7 +35,7 @@ This is an initial working sequence. The product requirements are accepted; task
 | ID | Milestone | State | Prerequisites |
 | --- | --- | --- | --- |
 | M00 | Local environment | Done | Current host identified |
-| M01 | Checked C3 memory | Not started | M00; explicit access contract |
+| M01 | Checked C3 memory | Ready | M00; T0002 exercise contract ready; wider-access contracts remain |
 | M02 | One Rust CPU step and native integration | Not started | M01; native interface specified |
 | M03 | First small guest program | Not started | M02; concrete platform/fault/stopping rules accepted |
 | M04 | OCaml assembly tools | Not started | M03; initial syntax and symbol format specified |
@@ -57,7 +57,7 @@ Rust and OCaml scaffold executables run; C3 static library builds; actual versio
 
 Byte/halfword/word access, little-endian conversion, bounds, and alignment behavior checked, including rejected writes.
 
-**Evidence:** None reported.
+**Evidence:** No memory implementation results reported. [T0002](tasks/T0002-checked-byte-access.md) is ready; byte access is only the first increment. Halfword/word and alignment checks remain.
 
 ### M02 · One Rust CPU step and native integration
 
@@ -112,6 +112,7 @@ Add small tasks as the next milestone is researched. Avoid creating a detailed b
 | Task | Milestone | State | Guide | Evidence |
 | --- | --- | --- | --- | --- |
 | **T0001 · Prepare local environment** | M00 | Done | [Open guide](tasks/T0001-development-environment.md) | [Observed checks on macOS ARM64](experiments/20261014.md) |
+| **T0002 · Checked C3 byte access** | M01 | Ready | [Open guide](tasks/T0002-checked-byte-access.md) | [Research](research/c3-checked-byte-access.md); implementation checks not performed |
 
 Each task's record and tutorial live together in `tasks/`. Create the next task with [the task template](tasks/TEMPLATE.md). Research notes belong in `research/`; experiment and proof results belong in `experiments/` or the relevant verification record.
 
@@ -129,10 +130,10 @@ These rows track full-MVP acceptance per host. A T0001 scaffold build is setup e
 ## Session handoff
 
 - Last confirmed result: T0001 acceptance checks passed on macOS 26.6.2 ARM64; Rust and OCaml scaffolds run and the C3 static library builds.
-- Prepared material: [environment setup](development-environment.md) and completed T0001.
-- Work remaining in the current task: none.
-- Next action: prepare the M01 guide for checked C3 byte reads/writes, including ownership, bounds, invalid-access behavior, and experiment-specific initial byte contents.
-- Pending verification: native integration, emulator behavior, P01, and all four full-MVP host targets.
+- Prepared material: completed T0001, [byte-access research](research/c3-checked-byte-access.md), and ready T0002.
+- Work remaining in T0002: hand-write byte operations and tests; record every acceptance check.
+- Next action: follow T0002 step 1 and document its borrowed-storage access contract beside the C3 operations.
+- Pending verification: T0002 byte-access checks, remaining M01 halfword/word and alignment behavior, native integration, emulator behavior, P01, and all four full-MVP host targets.
 
 ## Updating progress
 

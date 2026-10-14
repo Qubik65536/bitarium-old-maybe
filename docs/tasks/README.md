@@ -16,4 +16,4 @@ A useful guide explains what will be learned, the prerequisite state, files to w
 
 Research findings are separate from task execution. A guide can be ready before implementation begins. Add actual results only after the procedure is followed, and identify how each result was established. Keep task state synchronized with the tracker.
 
-Current guide: [T0001, development environment](T0001-development-environment.md).
+Current guide: [T0002, checked C3 byte access](T0002-checked-byte-access.md). Completed setup: [T0001](T0001-development-environment.md).

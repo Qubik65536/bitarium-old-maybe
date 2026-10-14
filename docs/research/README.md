@@ -13,3 +13,7 @@ Good first topics: ISA selection, load/store semantics, memory errors, Rust-nati
 ## Record the evidence
 
 Prefer official manuals and documentation. Record exact versions/sections when they affect behavior. Research conclusions are recommendations until recorded as accepted design decisions.
+
+## Investigations
+
+- [Checked C3 byte access over borrowed storage](c3-checked-byte-access.md): types, ownership, explicit bounds checks, and the isolated T0002 exercise.
