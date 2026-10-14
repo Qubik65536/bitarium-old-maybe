@@ -1,0 +1,4 @@
+(executable
+ (public_name bitarium_tools)
+ (name main)
+ (libraries bitarium_tools))
