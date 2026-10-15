@@ -39,6 +39,26 @@ For a byte access, validity is simply offset less than length. This avoids addit
 
 Use an explicitly initialized small array owned by each test. This teaches ownership without selecting the eventual RAM allocator or startup contents. A single byte has no endianness conversion and no additional alignment requirement.
 
+## Proposed exercise contract
+
+Status: proposed local exercise contract for T0002; not an accepted machine interface or C ABI. This collects the exercise assumptions in one place.
+
+| Aspect | Exercise expectation |
+| --- | --- |
+| Storage | Mutable byte slice owned by the caller; no allocation, freeing, or retained pointers |
+| Offset | Unsigned host-sized offset within the slice, not a guest address |
+| Read | Slice, offset, and non-null writable byte-output pointer; boolean status |
+| Write | Slice, offset, and unsigned byte value; boolean status |
+| Validity | Offset less than slice length; validate before indexing or changing output |
+| Successful read | Copy addressed byte to output; storage unchanged |
+| Successful write | Change only the addressed byte |
+| Failure | Return false; preserve all storage and failed-read output |
+| Caller preconditions | Backing storage lives through the call; read output points outside the backing slice |
+| Empty storage | Reject every offset |
+| Excluded behavior | Invalid pointers, dangling slices, output/storage aliasing, concurrency, signed offsets, allocation, guest traps |
+
+Fixture contents are explicit test inputs, not startup RAM policy. Multibyte byte order and alignment are outside this exercise. The accepted language choice is recorded in [ADR 0001](../decisions/0001-native-subsystem-c3.md); wider machine decisions remain in [decision state](../status.md).
+
 ## Open questions
 
 Guest address translation, RAM ownership/allocation, startup RAM contents, Rust/C3 signatures, permissions/devices, multibyte access and guest fault state updates remain unresolved or deferred. This exercise does not need them. Its temporary API can change before integration.

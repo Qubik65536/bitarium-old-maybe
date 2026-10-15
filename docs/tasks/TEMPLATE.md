@@ -20,29 +20,39 @@ One concrete behavior or outcome. State how completion can be observed.
 
 How it advances the machine and what concept will be learned.
 
-## Prerequisites and starting state
+## Before you start
 
-Required tools/versions, completed tasks, relevant decisions, and existing files. Name unresolved assumptions. Include a quick check that the starting state is correct.
+Link the completed prerequisite tasks and evidence. Name the tool/version and existing files to inspect, then give one quick starting-state check. Link relevant accepted decisions and unresolved proposals to their canonical records; keep their rationale there.
 
-## Research and references
+## Walkthrough
 
-Link relevant specifications, decisions, and research notes. Cite primary documentation with sections/versions or access dates where appropriate. Separate verified facts from proposed design choices and unresolved questions.
+### 1. [First small action]
 
-## Files involved
+Explain the idea needed for this action in plain language, using one concrete example. Introduce new terms here, where they become useful.
 
-Paths to inspect, edit, or create, with each file's role. Identify generated artifacts separately.
+Name the file to open or create and the exact behavior to write or inspect. Explain why this step matters. Link the relevant reference section beside the action. Leave the implementation for the reader.
 
-## Concepts to understand
+**Checkpoint:** Give an observable result or a short question with an expected answer. The reader should know whether to continue or troubleshoot.
 
-Explain the minimum theory needed for the exercise in concrete terms. State integer, byte-order, ownership, and error assumptions when relevant.
+### 2. [Next small action]
 
-## Procedure
+Build on the previous result. Explain the next idea through an example, then describe one focused edit or investigation. Explain commands before presenting them, including the directory to run them in.
 
-1. [Action, its purpose, and expected observable result.]
-2. [Next small action and expected result.]
-3. [Completion check.]
+**Checkpoint:** State the expected outcome. Expected output is a prediction, not recorded evidence.
 
-Describe implementation exercises as behaviors to write and inspect. Explain any setup/build command before presenting it. Expected results are predictions, not claims that commands were run.
+### 3. [Exercise a boundary or failure]
+
+Explain why the case matters, give concrete inputs and expected observations, and show how to inspect the result without supplying the full solution.
+
+**Checkpoint:** Name what must remain unchanged or what failure should be reported.
+
+### 4. [Verify and record]
+
+Give the relevant build/test procedure and explain what each check establishes. Record actual commands, versions, source state, outcomes, failures, and evidence source. Link the experiment template. Add or split steps as needed; keep each step small enough to inspect before continuing.
+
+## References and scope
+
+Link primary sources and research notes used in the walkthrough, including relevant versions/sections. Put accepted technical choices in decision records and exercise proposals in research notes. Include only the local assumptions needed to carry out this exercise; link wider design details rather than copying them into the guide.
 
 ## Acceptance checks
 

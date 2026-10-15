@@ -20,79 +20,116 @@ Hand-write byte read and write operations over caller-owned storage. Valid acces
 
 RAM begins as addressed bytes. This task makes the storage boundary explicit before adding little-endian words, guest address translation, CPU operations, or foreign calls. It is one increment of M01, not the whole milestone.
 
-## Prerequisites and starting state
+## Before you start
 
-[T0001](T0001-development-environment.md) is Done with [local evidence](../experiments/20261014.md). C3 0.8.5 built the static-library scaffold on macOS ARM64. Inspect `memory/src/main.c3` and `memory/project.json`: the current source has scaffold add/sub operations, while the configuration already includes `src/**` and `test/**`. Check your installed compiler version before working; if it differs, record that difference rather than assuming identical behavior.
+[T0001](T0001-development-environment.md) is Done with [local setup evidence](../experiments/20261014.md), including C3 0.8.5. Open `memory/src/memory.c3`: it currently exports add/sub functions. Those give you a working starting module; this task adds byte operations in `memory/src/bytes.c3` and tests in `memory/test/bytes.c3`.
 
-The RAM base, startup contents, allocation policy, and Rust ABI are still open in [decision state](../status.md). This exercise uses storage offsets and an explicitly initialized fixture; it does not settle those decisions.
+The C3 language choice belongs to [ADR 0001](../decisions/0001-native-subsystem-c3.md). Read the [proposed exercise contract](../research/c3-checked-byte-access.md#proposed-exercise-contract) for this task's temporary interface and preconditions. Wider choices stay in [decision state](../status.md#decision-state). No new architecture decision is needed to follow this exercise.
 
-## Research and references
+## Walkthrough
 
-Read [checked-byte research](../research/c3-checked-byte-access.md), especially the type and ownership distinctions. Keep [C3 arrays](https://c3-lang.org/language-common/arrays/) open for slice syntax and [basic types](https://c3-lang.org/language-fundamentals/basic-types-and-values/) for integer widths. [Build commands](https://c3-lang.org/build-your-project/build-commands/) explains test discovery. These rolling docs were inspected on 2026-10-14; compiler diagnostics take priority for version-specific syntax.
+### 1. Draw the storage you will access
 
-## Files involved
+Think of memory here as four numbered boxes, each holding one byte. A byte holds a value from 0 to 255. The number identifying a box is its **offset** from the beginning of this buffer.
 
-| File | Your work |
-| --- | --- |
-| `memory/src/main.c3` | Inspect scaffold; add the two small operations here, or put them in `memory/src/bytes.c3` using module `memory` |
-| `memory/test/bytes.c3` | Create C3 unit tests with descriptive names and the `@test` attribute |
-| `memory/project.json` | Inspect existing source/test-source paths; no new build target is expected |
-| `docs/experiments/` | Create an actual-results record using its template after running checks |
-| This task and `docs/progress.md` | Link evidence and reconcile task state after checks |
+Draw this fixture in your notes; values are hexadecimal:
 
-`memory/build/` contains generated output and is ignored. No Rust or OCaml changes are needed.
+| Offset | 0 | 1 | 2 | 3 |
+| --- | --- | --- | --- | --- |
+| Byte | 11 | 80 | FF | 44 |
 
-## Concepts to understand
+Length 4 means there are four boxes, not that box 4 exists. Offset 3 names the last box. Offset 4 names no box. This is why checking the boundary is part of the operation rather than relying on a crash afterward.
 
-**Bytes and offsets.** Use C3 `char` for an unsigned byte (0–255) and `usz` for an offset within host storage. `uint` is a 32-bit machine value; it is not interchangeable with a host-sized index. A future guest address must be translated and validated separately. No modular arithmetic is needed here.
+Open `memory/src/bytes.c3`, use the existing `memory` module, and write a short comment describing what the two byte operations will do. Link or refer to the proposed contract instead of inventing guest addresses.
 
-**Borrowing.** A mutable `char[]` slice refers to someone else's storage. The caller keeps it alive during the call. Your functions neither allocate/free that storage nor keep a pointer to it afterward. Fixed arrays passed by value are copied, so write tests must inspect the original array.
+**Checkpoint:** You can explain why offset 0 is valid, offset 4 is invalid, and an empty buffer has no valid offset.
 
-**Validity.** For length N, valid byte offsets are 0 through N−1. Compare the offset directly against N before indexing. Avoid computing offset+1 or N−1 as your general validity check; they introduce avoidable overflow or empty-buffer underflow. Every byte offset is aligned for this operation. Endianness matters only when several bytes encode a wider value.
+### 2. Give the functions access to the original storage
 
-### Exercise contract
+An **array** owns its elements. A **slice** is a view of existing elements: it tells the function where those elements are and how many there are. Imagine handing someone the location of your four boxes rather than giving them four copied boxes. Changes through that view affect the original storage.
 
-This is a local teaching contract, not an accepted machine or C ABI design. Implement a read operation taking a mutable byte slice, unsigned host offset, and non-null output pointer, returning a boolean status. Implement a write operation taking the same slice/offset plus an unsigned byte value, also returning status. Choose descriptive names yourself.
+Read the Slice section of [C3 arrays](https://c3-lang.org/language-common/arrays/). In `memory/src/bytes.c3`, write the declarations and bodies for the two operations incrementally. Use a mutable byte slice for storage. The caller will keep the array alive during each call; your operations should not save it for later.
 
-- Caller guarantees a valid slice whose backing storage lives through the call. For reads, the output pointer refers to a writable byte outside the backing slice; this excludes output/storage aliasing from the exercise.
-- Successful read copies exactly the addressed byte to the output and leaves storage unchanged.
-- Successful write changes exactly the addressed byte.
-- An offset greater than or equal to length returns failure before indexing. Failure leaves the whole storage unchanged; a failed read also leaves its output unchanged.
-- Empty storage rejects every offset. Null output pointers, dangling slices, concurrency, signed offsets, allocation, and guest traps are outside this contract. Do not attempt to test undefined caller behavior.
+For types, consult [C3 integers](https://c3-lang.org/language-fundamentals/basic-types-and-values/#integers): `char` holds an unsigned byte and `usz` holds a host-sized unsigned offset. The high byte 0xFF must remain 255. A guest register value and a host storage index serve different purposes even when both happen to contain 3.
 
-## Procedure
+The read operation needs somewhere to return the byte as well as a success/failure result. Follow the proposed contract's separate output-pointer approach: the caller provides a writable byte outside the buffer. The write operation instead receives the new byte value. Let both return boolean status. Choose descriptive names yourself.
 
-1. Write down the validity rule and ownership preconditions in source comments. Use the contract above without inventing a RAM base. Expected result: you can explain why offset 4 fails for a four-byte buffer and offset 3 succeeds.
-2. Hand-write the two operations. Put validation before any subscript or output update. Expected result: each operation has one straightforward successful path and an explicit failure path. Do not add exports or Rust linkage yet.
-3. Create independent C3 tests, each owning an explicitly initialized four-byte array such as `11 80 FF 44` in hexadecimal. Initialize the read output to a separate sentinel such as `A5`. Pass a slice that refers to that array. Compare against fixed expected values, not values generated by your new functions.
-4. Cover the following cases. Use fresh fixtures or restore them explicitly so one case cannot conceal another's failure.
+**Checkpoint:** You can identify who owns the array, which argument describes its length, and where a successful read puts the byte. Confirm your parameter types against the contract before filling in the behavior.
 
-| Case | Expected observation |
-| --- | --- |
-| Read offsets 0 and 3 | Success; values 0x11 and 0x44; entire storage unchanged |
-| Read offsets 1 and 2 | Success; 0x80 and 0xFF remain unsigned byte values |
-| Write offsets 0 and 3 | Success; original array changes at that offset only |
-| Write/read back 0x00, 0x80, 0xFF | Exact bytes preserved; check original array independently as well |
-| Read/write offset 4 | Failure; full array equals its before-snapshot; failed-read output still 0xA5 |
-| Read/write maximum `usz` value | Failure without indexing or arithmetic overflow; same preservation checks |
-| Empty slice, offsets 0 and maximum `usz` | Failure; read sentinel unchanged |
-| One-byte slice, offsets 0 and 1 | Offset 0 succeeds; offset 1 fails with preservation checks |
+### 3. Make one read succeed and one read fail
 
-Derive the maximum host-size value from the documented type facilities your compiler supports; do not hard-code a 64-bit literal. Construct an empty slice with length zero rather than forming an inclusive range ending at −1.
+Start with the read operation. Compare the offset directly with the slice length before indexing. For a four-byte slice, offset 4 must fail immediately. There is no need to compute offset+1; that addition introduces an overflow problem at the largest representable offset.
 
-5. Run the test driver from `memory/`. The first command records the compiler; the next two run your cases with safety checks enabled and disabled to establish that rejection comes from your explicit logic. The last builds the normal static library.
+After validation succeeds, copy the addressed byte to the output and return success. On failure, return false without changing the output. This lets the caller distinguish failure from successfully reading zero.
+
+Create `memory/test/bytes.c3`. Write a no-argument, void-returning test function marked `@test`; see [C3 testing](https://c3-lang.org/build-your-project/build-commands/). Give it its own explicitly initialized four-byte array from step 1 and a separate output byte initialized to 0xA5. That initial value is a **sentinel**: a recognizable value used to detect an unexpected write.
+
+Write assertions for a read at offset 0 and, using a fresh sentinel, a failed read at offset 4. Check status, output, and the original array. Use fixed expected values, not values calculated through your new operations.
+
+To compile and run this first checkpoint, run the test driver from the C3 project directory:
 
 ```sh
 cd memory
+c3c test --safe=yes
+```
+
+**Checkpoint:** Your named test is discovered. Offset 0 succeeds with 0x11; offset 4 fails with output still 0xA5. Storage remains `11 80 FF 44` after both reads. A bounds-check panic means rejection happened too late.
+
+### 4. Change one byte and inspect its neighbors
+
+Now write the store operation in `memory/src/bytes.c3`. Reuse the same validity rule. Only after validation should it change the addressed element and return success.
+
+Add a test with a fresh fixture. Write 0x00 at offset 1. Inspect the original array directly: it should now contain `11 00 FF 44`. Checking neighbors matters: merely reading back offset 1 could miss an accidental write to another position.
+
+Add a failed write at offset 4. Take a copy of the whole array before this call and compare every element afterward. This **snapshot** lets you check preservation even when earlier valid writes changed the fixture.
+
+Run the same test command again from `memory/`.
+
+**Checkpoint:** A valid write changes exactly one byte in the original array. An invalid write returns false and preserves the full before-snapshot. If the original array never changes, check whether you passed an array by value rather than a slice.
+
+### 5. Extend the tests to the edges
+
+You have checked the central behavior. Now target cases where assumptions often break. Add these cases in small groups, running tests after each group. Use fresh fixtures or explicitly restore them so earlier cases cannot hide a failure.
+
+| Add this case | Why it matters | Expected observation |
+| --- | --- | --- |
+| Read offsets 1, 2, 3 | High bytes and the final valid offset | Success with 0x80, 0xFF, 0x44; storage unchanged |
+| Write offsets 0 and 3 | Both ends of storage | Only the addressed byte changes |
+| Write/read back 0x00, 0x80, 0xFF | Zero and high byte values | Exact byte preserved; inspect storage independently too |
+| Maximum `usz` offset, read and write | Unnecessary arithmetic can overflow | False; entire buffer and failed-read sentinel unchanged |
+| Empty slice, offsets 0 and maximum `usz` | Length zero has no final element | False; failed-read sentinel unchanged |
+| One-byte slice, offsets 0 and 1 | Smallest nonempty buffer | Offset 0 succeeds; offset 1 fails with preservation checks |
+
+Use your compiler's type facilities to obtain the maximum `usz` value rather than assuming the host is 64-bit. For an empty slice, use a zero-length view of valid backing storage; avoid constructing an inclusive range ending at −1. Consult the slicing forms in [C3 arrays](https://c3-lang.org/language-common/arrays/).
+
+**Checkpoint:** Each rejection checks the boolean result, the complete storage snapshot, and the read sentinel where applicable. You can point to a named test covering each row.
+
+### 6. Check the implementation without compiler bounds checks
+
+Compiler safety checks help diagnose mistakes, but your functions promise to return failure themselves. Run the tests with safety enabled and disabled, then rebuild the library. From `memory/`:
+
+```sh
 c3c --version
 c3c test --safe=yes
 c3c test --safe=no
 c3c build
 ```
 
-Expected outcomes: both test invocations discover and pass your named tests, and the library build succeeds. A successful command with zero discovered tests is insufficient. These commands are instructions, not recorded runs. Inspect the configured paths or your test attributes if discovery fails; do not disable assertions to obtain a pass.
+The version command records the tool used. Both test runs should discover and pass your named cases. The final build checks that the normal library still compiles; it does not exercise the operations by itself. Generated C3 output stays under the configured build directory.
 
-6. Record actual date, host and compiler version, source revision plus any uncommitted changes, exact commands, discovered test names/count, output and exit status. Link the experiment below. Include any failed attempt and its focused fix. This evidence supports tested cases on that host, not a formal proof or other-host support.
+**Checkpoint:** Both modes pass the same cases, and the library builds. Zero discovered tests is insufficient. These are expected results, not evidence that the checks have already run.
+
+### 7. Save what actually happened
+
+Create an experiment note from [the experiment template](../experiments/TEMPLATE.md). Record actual date, host/compiler versions, source revision and uncommitted changes, exact commands, test names/count, output and exit status. Include any failing attempt and the fix you made.
+
+Link that note in this task's evidence section. Compare the results with every acceptance check below before changing task state. Tests cover those cases on that host; they do not prove all inputs correct.
+
+**Checkpoint:** Another session can reproduce your checks from the note, and unfinished checks are still visibly pending.
+
+## References and scope
+
+The [research note](../research/c3-checked-byte-access.md) holds source findings, alternatives, and the proposed exercise contract. This walkthrough implements only that byte-access exercise. Follow the linked decision records for platform requirements rather than extending this exercise into a guest memory map or Rust memory interface.
 
 ## Acceptance checks
 
@@ -124,4 +161,4 @@ No prerequisite blocker identified for this isolated exercise. All implementatio
 
 ## Handoff
 
-Last confirmed result: T0001 local environment checks passed. Immediate next action: document the exercise contract beside the C3 operations, then implement them by hand. After completion, prepare a separate small task for checked little-endian halfword access; M01 also still requires word access and alignment checks. Mark this task Done only after its recorded evidence satisfies the checks.
+Last confirmed result: T0001 local environment checks passed. Immediate next action: follow step 1 and draw the byte fixture before creating the byte-access source file. After completion, prepare a separate small task for checked little-endian halfword access; M01 also still requires word access and alignment checks. Mark this task Done only after its recorded evidence satisfies the checks.

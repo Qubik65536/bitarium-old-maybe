@@ -132,7 +132,7 @@ These rows track full-MVP acceptance per host. A T0001 scaffold build is setup e
 - Last confirmed result: T0001 acceptance checks passed on macOS 26.6.2 ARM64; Rust and OCaml scaffolds run and the C3 static library builds.
 - Prepared material: completed T0001, [byte-access research](research/c3-checked-byte-access.md), and ready T0002.
 - Work remaining in T0002: hand-write byte operations and tests; record every acceptance check.
-- Next action: follow T0002 step 1 and document its borrowed-storage access contract beside the C3 operations.
+- Next action: follow T0002 step 1: draw the four-byte fixture and create the byte-access source file.
 - Pending verification: T0002 byte-access checks, remaining M01 halfword/word and alignment behavior, native integration, emulator behavior, P01, and all four full-MVP host targets.
 
 ## Updating progress
