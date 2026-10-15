@@ -46,6 +46,8 @@ For a next-step request, give the objective, why it matters, the relevant files/
 
 ## Research, tutorials, and progress workflow
 
+Task guides must teach through a sequence of small, followable steps, rather than front-loading concept lists or presenting a specification as a tutorial. At each step, explain the needed idea in plain language with a concrete example, identify the file and action, explain why it matters, and give an observable checkpoint before continuing. Introduce terminology where it is first used. Keep implementation exercises incomplete so the owner writes the code; do not replace teaching with a complete solution. Link accepted design decisions to their canonical records instead of restating their rationale or requirements in task guides. Link exercise-specific proposals to research notes, label them as proposals, and keep only the local explanation needed to perform the step in the tutorial.
+
 When asked to research the next step or generate a guide, continue autonomously through the authorized documentation work:
 
 1. Read the current tracker and task record. Inspect relevant repository files without modifying implementation. Do not assume the previously suggested task was performed.
